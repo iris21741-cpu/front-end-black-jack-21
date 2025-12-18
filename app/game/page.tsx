@@ -210,6 +210,9 @@ export default function GamePage() {
   const { game, setGame } = useGameStore();
   const tableRef = useRef<HTMLDivElement>(null);
 
+  // game over
+  const [showGameOver, setShowGameOver] = useState(false);
+
   // 初始化把 token 從 localStorage 載回來（需在 store 有 hydrate）
   useEffect(() => {
     hydrate();
@@ -544,6 +547,11 @@ export default function GamePage() {
 
         setResult({ outcome, reason });
         setStage("RESULT");
+
+        // 新增：如果是 GAME_OVER → 顯示 Game Over 畫面
+        if (data.status === "GAME_OVER") {
+          setShowGameOver(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -774,12 +782,6 @@ export default function GamePage() {
         {/* 結算結果 + 再來一局 */}
         {result && (
             <div className="absolute inset-0 flex flex-col items-center justify-center z-50 bg-black/40">
-        {/* ⭐ GAME OVER / 遊戲結束 */}
-        <p className="mb-6 text-6xl font-black tracking-widest text-red-500 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]">
-         GAME OVER
-    </p>
-    {/* 若要中英一起 */}
-    {/* <p className="mb-6 text-5xl font-black text-red-500">遊戲結束</p> */}
 
            <div className="px-10 py-6 rounded-3xl bg-black/80 border-4 border-cyan-400 shadow-2xl mb-8">
               <p className="text-5xl font-black text-cyan-300 text-center mb-2">
@@ -806,6 +808,29 @@ export default function GamePage() {
               className="px-10 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black text-3xl font-black shadow-2xl transition-transform hover:scale-105"
             >
               再來一局
+            </button>
+          </div>
+        )}
+
+        {showGameOver && (
+          <div className="absolute inset-0 z-[60] bg-black/80 flex flex-col items-center justify-center">
+            <div className="px-12 py-8 rounded-3xl bg-black border-4 border-red-500 shadow-2xl mb-8">
+              <p className="text-6xl font-black text-red-400 text-center mb-4">
+                GAME OVER
+              </p>
+              <p className="text-2xl text-gray-300 text-center">
+                遊戲結束
+              </p>
+            </div>
+
+            <button
+            onClick={() => {
+              setShowGameOver(false);
+              createNewGame(true);
+            }}
+            className="px-12 py-5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black text-4xl font-black shadow-2xl transition-transform hover:scale-105"
+            >
+              繼續
             </button>
           </div>
         )}
